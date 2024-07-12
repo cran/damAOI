@@ -6,12 +6,13 @@
 \usage{
 getimpactedarea(
   reservoir,
-  water_bodies,
+  water_bodies = NULL,
   dem,
   fac,
   basins,
   pourpoints,
-  tocrop = TRUE,
+  toprocess = TRUE,
+  espg = 4326,
   toadjust = FALSE,
   poss_expand = 20000,
   river_distance = 1e+05,
@@ -26,7 +27,7 @@ getimpactedarea(
 \arguments{
 \item{reservoir}{An sf polygon, with an unstandardised raw reservoir}
 
-\item{water_bodies}{A rast, where 1 indicates water, NA otherwise}
+\item{water_bodies}{A rast, where 1 indicates water, NA otherwise. Required if toadjust == TRUE.}
 
 \item{dem}{A rast, showing elevation}
 
@@ -36,7 +37,9 @@ getimpactedarea(
 
 \item{pourpoints}{An sf multipoint, showing the points where rivers flow in and out of reservoirs}
 
-\item{tocrop}{A true/false parameter whether crop all input rasters by the river distance}
+\item{toprocess}{Whether to reprocess input data from 4326 to UTM (the default for consistency)}
+
+\item{espg}{In case processing to UTM or other CRS has been done (not making use of preprocessing) the espg code to include}
 
 \item{toadjust}{A true/false parameter whether to adjust the reservoir to surrounding water bodies}
 

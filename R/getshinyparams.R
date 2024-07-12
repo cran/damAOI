@@ -1,7 +1,7 @@
 #' getshinyparams
 #' 
 #' @export
-#' @returns An parameters to start the shiny app for determining pour points manually for a given reservoir
+#' @returns Parameters to start the shiny app for determining pour points manually for a given reservoir
 #' @import shiny
 #' @import leaflet
 #' @import shinydashboard

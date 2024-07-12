@@ -4,10 +4,12 @@
 \alias{pointstolines}
 \title{pointstolines}
 \usage{
-pointstolines(riverpoints)
+pointstolines(riverpoints, espg)
 }
 \arguments{
 \item{riverpoints}{list of dataframes returned by the riverpoints function.}
+
+\item{espg}{espg code of UTM zone}
 }
 \value{
 An list of upstream lines (multilinestring) and downstream line (linestring)

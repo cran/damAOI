@@ -4,12 +4,11 @@
 #' @export
 #' @returns An sf multipolygon with the reservoir buffer, upstream and downstream areas
 #' @param reservoir An sf polygon, with an unstandardised raw reservoir
-#' @param water_bodies A rast, where 1 indicates water, NA otherwise
+#' @param water_bodies A rast, where 1 indicates water, NA otherwise. Required if toadjust == TRUE.
 #' @param dem A rast, showing elevation
 #' @param fac A rast, showing accumulated water flow along river
 #' @param pourpoints An sf multipoint, showing the points where rivers flow in and out of reservoirs
 #' @param basins An sf multipolygon, with the basins in the area around the dam
-#' @param tocrop A true/false parameter whether crop all input rasters by the river distance
 #' @param toadjust A true/false parameter whether to adjust the reservoir to surrounding water bodies
 #' @param poss_expand A number, indicating the number of meters away from the raw reservoir the reservoir may expand to. Default is 20000 (20km).
 #' @param river_distance A number, indicating the number of meters downstream and upstream for the area of interest. Defaults to 100000 (100km)
@@ -18,17 +17,20 @@
 #' @param e_tolerance A number indicating the tolerance to changes in elevation. Rivers flow downstream. But DEMs can show downstream areas of the river as higher, due to averaging nearby pixels. This is particularly true when rivers run through gorges. If there is no downstream lower river poitn nearby, the elevation tolerance allows the algorithm to select a point at a higher elevation, up to the threshold defined here.
 #' @param streambuffersize A number indicating the distance around the upstream and downstream river to consider as impacted. Defaults to 2000 (2km).
 #' @param reservoirbuffersize A number indicating the distance around the reserviur to consider as impacted. Defaults to 5000 (5km)
-#' @param wbjc A number, the water body join correction. This indicates the buffer zone for the reservoir, to ensure that it is contiguous (important where there are small channels connecting different parts of the same water body). Default is 0, but is necessary for some dams depending on the context. 
+#' @param wbjc A number, the water body join correction. This indicates the buffer zone for the reservoir, to ensure that it is contiguous (important where there are small channels connecting different parts of the same water body). Default is 0, but is necessary for some dams depending on the context.
+#' @param espg In case processing to UTM or other CRS has been done (not making use of preprocessing) the espg code to include
+#' @param toprocess Whether to reprocess input data from 4326 to UTM (the default for consistency)
 
 
 getimpactedarea <- function(
                           reservoir,
-                          water_bodies,
+                          water_bodies = NULL, # required if toadjust is TRUE
                           dem,
                           fac,
                           basins,
                           pourpoints,
-                          tocrop = TRUE,
+                          toprocess = TRUE,
+                          espg = 4326,
                           toadjust = FALSE,
                           poss_expand = 20000,
                           river_distance = 100000,
@@ -41,15 +43,30 @@ getimpactedarea <- function(
   
   # attempts to correct for invalid geometries for the input polygon
   reservoir <- reservoir %>% st_make_valid()
-  if(tocrop == TRUE){
-  cropped <- cropdata(reservoir = reservoir, 
-                      dem = dem, fac = fac, water_bodies = water_bodies, basins = basins, 
-                      river_distance = river_distance)
-  dem <- cropped[[1]]; fc <- cropped[[2]]; wb <- cropped[[3]]; basins <- cropped[[4]]
+  if(toprocess == TRUE){
+    preprocessed <- preprocessing(
+      reservoir = reservoir, 
+      river_distance = river_distance,
+      dem = dem, 
+      fac = fac, 
+      water_bodies = water_bodies,
+      basins = basins, 
+      pourpoints = pourpoints)
+    reservoir <- preprocessed[[1]]
+    dem <- preprocessed[[2]]
+    fac <- preprocessed[[3]]
+    basins <- preprocessed[[4]]
+    water_bodies <- preprocessed[[5]]
+    pourpoints <- preprocessed[[6]]
+    espg <- preprocessed[[7]]
   }
+  if(toprocess == FALSE){
+    espg = espg
+  }
+
   if(toadjust == TRUE){
   # adjusts the surface area of the reservoir with satellite-observed surface water to ensure consistency.
-  reservoir <- adjustreservoirpolygon(reservoir = reservoir, 
+    reservoir <- adjustreservoirpolygon(reservoir = reservoir, 
                                       water_bodies = water_bodies, 
                                       dem = dem,
                                       poss_expand = poss_expand,
@@ -70,7 +87,7 @@ getimpactedarea <- function(
          fac = fac,
          dem = dem)
 
-  riverlines <- pointstolines(riverpoints = riverpoints)
+  riverlines <- pointstolines(riverpoints = riverpoints, espg = espg)
 
   #creates buffers and clips to basins
   
@@ -83,5 +100,6 @@ getimpactedarea <- function(
   
   # 'smooths' final polygon to remove jagged edges due to raster processing
   impactedarea <- smoothr::smooth(impactedarea[[2]], method = "ksmooth", smoothness = 3)
+
   return(impactedarea)
 }

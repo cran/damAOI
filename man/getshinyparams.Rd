@@ -10,7 +10,7 @@ getshinyparams(res)
 \item{res}{An sf polygon, with an unstandardised raw reservoir}
 }
 \value{
-An parameters to start the shiny app for determining pour points manually for a given reservoir
+Parameters to start the shiny app for determining pour points manually for a given reservoir
 }
 \description{
 getshinyparams

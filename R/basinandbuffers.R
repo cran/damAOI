@@ -1,14 +1,19 @@
 #' Buffers the reservoir and the river, and clips to basin areas
 #' @export
 #' @returns A two element list. Element 1 is an sf multipolygon with the reservoir buffer, upstream and downstream areas. Element 2 is the same, but clipped to river basin polygons.
-#' @param reservoir An sf polygon, with an unstandardised raw reservoir
+#' @param reservoir An sf polygon, with a reservoir
 #' @param upstream An sf line, following the river upstream of the reservoir 
 #' @param downstream An sf line, following the river downstream of the reservoir 
 #' @param basins An sf multipolygon, with the basins in the area around the dam 
 #' @param streambuffersize A number indicating the distance around the upstream and downstream river to consider as impacted. Defaults to 2000 (2km).
 #' @param reservoirbuffersize A number indicating the distance around the reserviur to consider as impacted. Defaults to 5000 (5km)
 
-basinandbuffers <- function(reservoir,upstream,downstream,basins,streambuffersize,reservoirbuffersize){
+basinandbuffers <- function(reservoir,
+                            upstream,
+                            downstream,
+                            basins,
+                            streambuffersize,
+                            reservoirbuffersize){
   # combines reservoir and stream lines
   basearea <- rbind(reservoir$geometry,upstream,downstream)
   # buffers the reserrvoir by buffer size parameter.

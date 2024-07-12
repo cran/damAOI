@@ -95,17 +95,6 @@ getriverpoints <- function(reservoir,
   output <- cbind(rep(NA,nrow(fac_sf)),rep(NA,nrow(fac_sf)),rep(NA,nrow(fac_sf)),rep(NA,nrow(fac_sf)),rep(NA,nrow(fac_sf),),rep(NA,nrow(fac_sf)))
   #  initialise points id column
   points$id <- 1:nrow(points)
-  # find midpoint of all points
-  centres <- apply(matrix(unlist(points$geometry), ncol = 2, byrow = TRUE), FUN = "mean", MARGIN = 2)
-  latitude <- centres[2]
-  longitude <- centres[1]
-  # find utm zone based on midpoint
-  espg <- getutm(latitude,longitude)
-  # transform all points to utm
-  points <- st_transform(points, espg)
-  # transform reservoir to utm
-  damnewcrs <- st_transform(reservoir, espg)
-  # finds the starting point
   closest <- points[points$dtostart == min(points$dtostart),]
   # sets initial distance at 0
   distance <- 0
@@ -114,6 +103,7 @@ getriverpoints <- function(reservoir,
   
   while(incrementor < nrow(fac_sf)){ # while incrementor is less than the number of river points (the maximum length of the river)
     mp <- matrix(unlist(points$geometry), ncol = 2, byrow = T) # gets xy of all points
+    if(nrow(points) <= 3){break} # knn doesn't make much sense at this point, and the algorithm breaks. Normally by the sea or the source.
     nd <- get.knnx(mp,mp,ifelse(nrow(mp) <= nn, nrow(mp), nn)) # finds k nearest neighbours (where k is set as nn, or if there are fewer than nn points remaining, it is all points)
     if(incrementor == 1){ # process for first point is different
       pl <- points[points$id == closest$id,] # pl (point last) is where the id is equal to the id of closest
@@ -145,7 +135,7 @@ getriverpoints <- function(reservoir,
     incrementor = incrementor + 1 # resets the process to further down/up the river
   }
   # loop finished
-  riverpoints <- data.frame(output) %>% drop_na() %>% mutate(espg = espg, direction = pourpoint$direction) # transforms output to a tibble, removes nas and adds the projection information
-  colnames(riverpoints) <- c("x", "y", "dist", "dist_accum", "flow_accum", "flow_change", "espg")
+  riverpoints <- data.frame(output) %>% drop_na() %>% mutate(direction = pourpoint$direction) # transforms output to a data frame and adds direction info
+  colnames(riverpoints) <- c("x", "y", "dist", "dist_accum", "flow_accum", "flow_change", "direction")
   return(riverpoints)
   }

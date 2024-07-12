@@ -6,14 +6,14 @@
 #' @param fac A rast, showing accumulated water flow along river
 
 
-autogetpourpoints <- function(reservoir, fac){  
-  dam_buffer <- st_buffer(reservoir, 2000)
+autogetpourpoints <- function(reservoir, fac){
+  dam_buffer <- st_buffer(reservoir, 1000)
   # crops the flow accumulation raster to the dam buffer
   fac_dam <- crop(fac, dam_buffer, snap = "out")
   # removes low/insignificant values of flow accumulation
   fac_dam[fac_dam <= 50] <- NA
   # creates a raster for the dam extent
-  dam_binary <- rasterize(vect(reservoir), fac_dam)
+  dam_binary <- rasterize(vect(dam_buffer), fac_dam)
   x <- fac_dam * dam_binary
   # takes x, a one-band flow accumulation in rast format
   x <-   as.data.frame(x, xy = TRUE)

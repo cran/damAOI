@@ -5,10 +5,10 @@
 #' @param water_bodies A rast, where 1 indicates water, NA otherwise
 #' @param dem A rast, showing elevation
 #' @param poss_expand A number, indicating the number of meters away from the raw reservoir the reservoir may expand to. Default is 20000 (20km).
-#' @param wbjc A number, the water body join correction. This indicates the buffer zone for the reservoir, to ensure that it is contiguous (important where there are small channels connecting different parts of the same water body). Default is 0, but is necessary for some dams depending on the context. 
+#' @param wbjc A number indicating a "water body join correction". This is a small buffer zone for the reservoir polygon to ensure that it is contiguous (important where there are small channels connecting different parts of the same water body). Default is 0 but it is necessary for some dams to include a small buffer, particularly if the reservoir has areas which are less wide than the resolution of the underlying DEM. 
 
 adjustreservoirpolygon <- function(reservoir, water_bodies, dem, poss_expand = 20000, wbjc =0) {
-# creates a buffer zone around the GRanD polygon, size defined by "poss_expand parameter"
+# creates a buffer zone around the polygon, size defined by "poss_expand parameter"
   rb <- st_buffer(reservoir, poss_expand)
 # crops the water bodies raster by this buffer area  
   wb <- crop(water_bodies, rb)

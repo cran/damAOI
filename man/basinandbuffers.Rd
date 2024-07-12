@@ -14,7 +14,7 @@ basinandbuffers(
 )
 }
 \arguments{
-\item{reservoir}{An sf polygon, with an unstandardised raw reservoir}
+\item{reservoir}{An sf polygon, with a reservoir}
 
 \item{upstream}{An sf line, following the river upstream of the reservoir}
 

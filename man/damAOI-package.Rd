@@ -8,7 +8,15 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Define a spatial 'Area of Interest' (AOI) around a constructed dam using hydrology data. Dams have environmental and social impacts, both positive and negative. Current analyses of dams have no consistent to specify at what spatial extent we should evaluate these impacts. 'damAOI' implements methods to adjust reservoir polygons to match satellite-observed surface water areas, plot upstream and downstream rivers using elevation data and accumulated river flow, and draw buffers clipped by river basins around reservoirs and relevant rivers. This helps to consistently determine the areas which could be impacted by dam construction, facilitating comparative analysis and informed infrastructure investments.
+Define a spatial 'Area of Interest' (AOI) around a constructed dam using hydrology data. Dams have environmental and social impacts, both positive and negative. Current analyses of dams have no consistent way to specify at what spatial extent we should evaluate these impacts. 'damAOI' implements methods to adjust reservoir polygons to match satellite-observed surface water areas, plot upstream and downstream rivers using elevation data and accumulated river flow, and draw buffers clipped by river basins around reservoirs and relevant rivers. This helps to consistently determine the areas which could be impacted by dam construction, facilitating comparative analysis and informed infrastructure investments.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/chrislittleboy/damaoi}
+  \item Report bugs at \url{https://github.com/chrislittleboy/damaoi/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Chris Littleboy \email{chris.littleboy@stir.ac.uk} (\href{https://orcid.org/0000-0002-3293-7987}{ORCID})

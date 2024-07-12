@@ -6,31 +6,15 @@ getnextpoint <- function(points,pl,nd,ac_tolerance,e_tolerance,direction,nn){
   nn <- ifelse(nrow(points) <= nn, nrow(points), nn)
   if(direction == "downstream"){
   # gets the index (lower means closer) for the points which meet the following conditions  
-    index <- min(
-      intersect(intersect(intersect(
-        which(
-          points$ac[nd$nn.index[pl$id,2:nn]] >= pl$ac), # higher accumulation
-        which(
-          points$e[nd$nn.index[pl$id,2:nn]] <= pl$e)), # lower elevation
-        which(
-          points$ac[nd$nn.index[pl$id,2:nn]] / ac_tolerance <= pl$ac)), # within accumulation tolerance
-        which(
-          abs(points$e[nd$nn.index[pl$id,2:nn]]-pl$e) <= e_tolerance)) # within elevation tolerance
-    )
-  }
+    c1 <- which(points$ac[nd$nn.index[pl$id,2:nn]] >= pl$ac)
+    c2 <- which(points$e[nd$nn.index[pl$id,2:nn]] <= pl$e + e_tolerance)
+    c3 <- which(points$ac[nd$nn.index[pl$id,2:nn]] / ac_tolerance <= pl$ac)
+    index <- min(intersect(intersect(c1,c2),c3)) }
   if(direction == "upstream") {
-    index <- min(
-      intersect(intersect(intersect(
-        which(
-          points$ac[nd$nn.index[pl$id,2:nn]] <= pl$ac), # lower accumulation
-        which(
-          points$e[nd$nn.index[pl$id,2:nn]] >= pl$e)), # higher elevation
-        which(
-          points$ac[nd$nn.index[pl$id,2:nn]] * ac_tolerance >= pl$ac)), # within accumulation tolerance
-        which(
-          abs(points$e[nd$nn.index[pl$id,2:nn]]-pl$e) <= e_tolerance) # within elevation tolerance
-      )
-    )
+    c1 <- which(points$ac[nd$nn.index[pl$id,2:nn]] <= pl$ac) # lower accumulation
+    c2 <- which(points$e[nd$nn.index[pl$id,2:nn]] >= pl$e - e_tolerance) # higher elevation
+    c3 <- which(points$ac[nd$nn.index[pl$id,2:nn]] * ac_tolerance >= pl$ac) # with accumulation tolerance
+    index <- min(intersect(intersect(c1,c2),c3))
   }
   pn <- points[points$id == nd$nn.index[pl$id,index+1],] # stores id of next point (in relation to last point)
   pn$d <- nd$nn.dist[pl$id,index+1] # and the distance away from the last point
